@@ -4,11 +4,19 @@
 #include <cstdint>
 
 const unsigned int VIDEO_WIDTH = 64;
-const unsigned int VIEDO_HEIGHT = 32;
+const unsigned int VIDEO_HEIGHT = 32;
 
 class Chip8
 {
 public:
+    Chip8();
+    void LoadROM(char const *);
+    void Cycle();
+
+    uint8_t keypad[16]{};
+    uint32_t video[64 * 32]{};
+
+private:
     uint8_t registers[16]{};
     uint8_t memory[4096]{};
     uint16_t index{};
@@ -17,14 +25,10 @@ public:
     uint8_t sp{};
     uint8_t delayTimer{};
     uint8_t soundTimer{};
-    uint8_t keypad[16]{};
-    uint32_t video[64 * 32]{};
     uint16_t opcode{};
+
     std::default_random_engine randGen;
     std::uniform_int_distribution<uint8_t> randByte;
-
-    Chip8();
-    void LoadROM(char const *);
 
     void OP_00E0();
     void OP_00EE();
@@ -60,4 +64,17 @@ public:
     void OP_Fx33();
     void OP_Fx55();
     void OP_Fx65();
+    void OP_NULL();
+
+    void Table0();
+    void Table8();
+    void TableE();
+    void TableF();
+
+    typedef void (Chip8::*Chip8Func)();
+    Chip8Func table[0xF + 1];
+    Chip8Func table0[0xE + 1];
+    Chip8Func table8[0xE + 1];
+    Chip8Func tableE[0xE + 1];
+    Chip8Func tableF[0x65 + 1];
 };
